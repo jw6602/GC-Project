@@ -2,6 +2,7 @@ import networkx
 from typing import List
 
 class edge():
+    
     def __init__(self, src, dst, wt):
         self.src = src
         self.dst = dst
@@ -16,7 +17,7 @@ class PMFG():
 
     def sort_edge(self) -> List[edge]:
         sort_edges = []
-        for src, dst, data in sorted(self.origin_graph.edges(data=True), key=lambda x: x[2]["weight"], reverse = True):
+        for src, dst, data in sorted(self.origin_graph.edges(data=True), key=lambda x: x[2]["weight"], reverse=True):
             sort_edges.append(edge(src, dst, data["weight"]))
         self.sort_edges = sort_edges
         return sort_edges
