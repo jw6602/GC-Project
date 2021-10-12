@@ -30,6 +30,10 @@ class PMFG():
         for edge in self.sort_edges:
             # Adding edge and check the planarity
             pmfg_graph.add_edge(edge.src, edge.dst, weight=edge.wt)
+            # This planarity check algorithm is a little bit slow
+            # We may switch to https://github.com/hagberg/planarity/
+            # import planarity
+            # planarity.is_planar(pmfg_graph)
             is_planar, _ = networkx.algorithms.planarity.check_planarity(pmfg_graph)
             # If the graph is not planar, then remove the edge
             if not is_planar:
@@ -40,6 +44,7 @@ class PMFG():
         return pmfg_graph
 
 if __name__ == "__main__":
+    # An example
     G = networkx.random_geometric_graph(200,0.3)
     import random
     for (u,v,w) in G.edges(data=True):
