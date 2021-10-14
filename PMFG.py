@@ -2,7 +2,14 @@ import networkx
 from typing import List
 
 class edge():
-    
+    """
+    Create an edge from `src` to `dst` with weight `wt`
+
+    @params
+    src: source node
+    dst: destination node
+    wt: weight
+    """
     def __init__(self, src, dst, wt):
         self.src = src
         self.dst = dst
