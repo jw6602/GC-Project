@@ -18,18 +18,17 @@ class edge():
 
 class PMFG():
 
-    def __init__(self, graph: networkx.Graph):
+    def __init__(self, graph: networkx.Graph, planarity_check_lib: str="default", verbose: bool=False):
         self.origin_graph = graph
         self.sort_edges = None
         self.pmfg_graph = None
+        self.planarity_check_lib = planarity_check_lib
+        self.verbose = verbose
 
     def sort_edge(self) -> List[edge]:
         sort_edges = []
-        print("sort_edge starts")
         for src, dst, data in sorted(self.origin_graph.edges(data=True), key=lambda x: x[2]["weight"], reverse=True):
-            print(f"Adding the edge from {edge.src} to {edge.dst} with weight {edge.wt}")
             sort_edges.append(edge(src, dst, data["weight"]))
-        print("sort_edge ends")
         self.sort_edges = sort_edges
         return sort_edges
     
@@ -40,25 +39,19 @@ class PMFG():
         pmfg_graph = networkx.Graph()
         for edge in self.sort_edges:
             # Adding edge and check the planarity
-            print(f"Adding the edge from {edge.src} to {edge.dst} with weight {edge.wt}")
             pmfg_graph.add_edge(edge.src, edge.dst, weight=edge.wt)
-            # This planarity check algorithm is a little bit slow
-            # is_planar, _ = networkx.algorithms.planarity.check_planarity(pmfg_graph)
-            # We may switch to https://github.com/hagberg/planarity/
-            is_planar = planarity.is_planar(pmfg_graph)
             # If the graph is not planar, then remove the edge
-            if not is_planar:
+            if not self.is_planar(pmfg_graph, self.planarity_check_lib):
                 pmfg_graph.remove_edge(edge.src, edge.dst)
-            if pmfg_graph.number_of_edges == 3 * number_of_nodes - 2:
+            if self.verbose:
+                    print(f"Number of edges added = {pmfg_graph.number_of_edges()}, Number of edges to be added = {3 * (number_of_nodes - 2) - pmfg_graph.number_of_edges()}")
+            if pmfg_graph.number_of_edges() == 3 * (number_of_nodes - 2):
                 break
         self.pmfg_graph = pmfg_graph
         return pmfg_graph
 
-if __name__ == "__main__":
-    # An example
-    G = networkx.random_geometric_graph(200,0.3)
-    import random
-    for (u,v,w) in G.edges(data=True):
-        G.edges[u,v]['weight'] = random.randint(1,10)
-    pos = networkx.get_node_attributes(G, "pos")
-    networkx.draw_networkx_edges(PMFG(graph=G).compute(), pos=pos)
+    @staticmethod
+    def is_planar(graph: networkx.Graph, planarity_check_lib: str="default") -> bool:
+        if planarity_check_lib == "networkx":
+            return networkx.algorithms.planarity.check_planarity(graph)[0]
+        return planarity.is_planar(graph)
