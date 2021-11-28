@@ -10,6 +10,7 @@ class KalmanFilter():
         R = covariance of the observation noise
         B = control-input model
         P = posteriori estimate covariance matrix
+        x0 = initial guess
         '''
         self.F = F
         self.H = H
